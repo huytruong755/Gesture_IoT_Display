@@ -104,6 +104,11 @@ results_list = deque(maxlen=MAX_RESULTS)
 cooldown = 0
 COOLDOWN_FRAMES = 5
 
+# Thêm biến tracking
+last_sent_code = None
+hand_absent_frames = 0
+HAND_ABSENT_THRESHOLD = 8  # ~8 frame liên tiếp không có tay → gửi stop
+
 def extract_keypoints(results):
     if results.multi_hand_landmarks:
         hand = results.multi_hand_landmarks[0]
@@ -123,6 +128,8 @@ while cap.isOpened():
     cv2.rectangle(frame, (0, frame.shape[0]-150), (frame.shape[1], frame.shape[0]), (0,0,0), -1)
     
     if results.multi_hand_landmarks:
+        hand_absent_frames = 0          # reset đếm
+        
         for hand_landmarks in results.multi_hand_landmarks:
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
         
@@ -145,22 +152,38 @@ while cap.isOpened():
             if confidence >= CONFIDENCE_THRESHOLD:
                 result = action_labels[predicted_action]
                 code = gesture_codes.get(predicted_action, '?')
-                # Gửi mã lên COM3 khi nhận diện được
-                if ser and ser.is_open:
-                    try:
-                        ser.write(code.encode())
-                        print(f"Gửi mã: {code} ({predicted_action}) - Confidence: {confidence:.2f}")
-                    except Exception as e:
-                        print(f"Lỗi gửi serial: {e}")
-                else:
-                    print(f"⚠ Serial port không mở. Mã không được gửi: {code}")
+                
+                # Chỉ gửi khi đổi cử chỉ — tránh spam Serial
+                if code != last_sent_code:
+                    if ser and ser.is_open:
+                        try:
+                            ser.write(code.encode())
+                            print(f"Gửi: {code} ({predicted_action}) - {confidence:.2f}")
+                        except Exception as e:
+                            print(f"Lỗi gửi serial: {e}")
+                    else:
+                        print(f"⚠ Serial port không mở. Mã không được gửi: {code}")
+                    last_sent_code = code
                 
                 if not results_list or result != results_list[-1]:
                     results_list.append(result)
                     cooldown = COOLDOWN_FRAMES
                     frames_buffer.clear()
     else:
+        # Không thấy tay
+        hand_absent_frames += 1
         frames_buffer.clear()
+
+        if hand_absent_frames == HAND_ABSENT_THRESHOLD:
+            # Chỉ gửi 1 lần khi vừa mất tay
+            if ser and ser.is_open:
+                try:
+                    ser.write(b'0')
+                    print("Bỏ tay → gửi stop")
+                except Exception as e:
+                    print(f"Lỗi gửi stop: {e}")
+            last_sent_code = None       # reset để cử chỉ sau được gửi lại
+        
         cv2.putText(frame, "Khong tay!", (10, 30), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
