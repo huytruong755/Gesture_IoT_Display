@@ -1,0 +1,137 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\document\\cuChiTay\\WinFormsApp2\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\dashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\dashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\dangnhap.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\dangnhap.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\dangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\dangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\dashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\dashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|D:\\document\\cuChiTay\\WinFormsApp2\\winformsapp2\\dangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\dangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\modify.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\modify.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|d:\\document\\cuchitay\\winformsapp2\\winformsapp2\\gesturehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC5D3017-9F03-EC78-92D1-31A48FEDCC15}|WinFormsApp2\\WinFormsApp2.csproj|solutionrelative:winformsapp2\\gesturehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Modify.cs",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Modify.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\Modify.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Modify.cs",
+              "RelativeToolTip": "WinFormsApp2\\Modify.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAUwB8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T06:36:10.801Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DangNhap.Designer.cs",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.Designer.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\DangNhap.Designer.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.Designer.cs",
+              "RelativeToolTip": "WinFormsApp2\\DangNhap.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T06:08:59.556Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DangNhap.cs",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\DangNhap.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.cs",
+              "RelativeToolTip": "WinFormsApp2\\DangNhap.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAADgvygAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T06:08:56.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Dashboard.cs",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Dashboard.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\Dashboard.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Dashboard.cs",
+              "RelativeToolTip": "WinFormsApp2\\Dashboard.cs",
+              "ViewState": "AgIAAN0BAAAAAAAAAAAqwO8BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T18:26:34.817Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Dashboard.cs [Design]",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Dashboard.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\Dashboard.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\Dashboard.cs [Design]",
+              "RelativeToolTip": "WinFormsApp2\\Dashboard.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T16:31:46.695Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "GestureHistory.cs",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\GestureHistory.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\GestureHistory.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\GestureHistory.cs",
+              "RelativeToolTip": "WinFormsApp2\\GestureHistory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T06:38:27.657Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DangNhap.cs [Design]",
+              "DocumentMoniker": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.cs",
+              "RelativeDocumentMoniker": "WinFormsApp2\\DangNhap.cs",
+              "ToolTip": "D:\\document\\cuChiTay\\WinFormsApp2\\WinFormsApp2\\DangNhap.cs [Design]",
+              "RelativeToolTip": "WinFormsApp2\\DangNhap.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T06:08:45.407Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
