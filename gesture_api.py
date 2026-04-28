@@ -18,8 +18,57 @@ import base64
 import threading
 from flask import Flask, jsonify, request
 from datetime import datetime
+import pyodbc
 
 app = Flask(__name__)
+
+# ═══════════════════════════════════════════════════════════
+# DATABASE CONNECTION
+# ═══════════════════════════════════════════════════════════
+DB_CONNECTION = r'Driver={ODBC Driver 17 for SQL Server};Server=localhost\SQLEXPRESS;Database=Database_Gesture;Trusted_Connection=yes;'
+
+def get_db_connection():
+    """Kết nối database"""
+    try:
+        conn = pyodbc.connect(DB_CONNECTION)
+        return conn
+    except Exception as e:
+        print(f"DB Connection Error: {e}")
+        return None
+
+def execute_query(query, params=None):
+    # Thực thi query
+    conn = get_db_connection()
+    if not conn:
+        print("Database connection failed")
+        return None
+    try:
+        cursor = conn.cursor()
+        if params:
+            print(f"Executing query with params: {params}")
+            cursor.execute(query, params)
+        else:
+            print(f"Executing query")
+            cursor.execute(query)
+        
+        # Fetch trước khi commit
+        if 'SELECT' in query.upper():
+            result = cursor.fetchall()
+        else:
+            result = cursor.rowcount
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print(f"Query executed successfully, result: {result}")
+        return result
+    except Exception as e:
+        print(f"Query Error: {e}")
+        print(f"   Query: {query}")
+        print(f"   Params: {params}")
+        if conn:
+            conn.close()
+        return None
 
 # ═══════════════════════════════════════════════════════════
 # CONFIGURATION
@@ -73,6 +122,14 @@ class GestureEngine:
         self.current_timestamp = None
         self.ser = None
         self.led_status = False
+        
+        # ⭐ Database
+        self.com_port = None
+        self.device_id = None
+        self.session_id = None
+        self.start_time = None
+        self.gesture_count = 0
+        self.confidence_sum = 0.0
         
         # Buffers
         self.frames_buffer = deque(maxlen=FRAMES_TO_CAPTURE)
@@ -143,12 +200,125 @@ class GestureEngine:
     def _initialize_serial(self, com_port='COM3', baudrate=9600):
         """Initialize serial port for Arduino"""
         try:
+            # ⭐ Đóng port cũ nếu còn mở
+            if self.ser and self.ser.is_open:
+                try:
+                    self.ser.close()
+                    time.sleep(0.2)
+                except:
+                    pass
+            
             self.ser = serial.Serial(com_port, baudrate, timeout=1)
+            self.com_port = com_port
             time.sleep(0.5)
             print(f"✓ Serial port {com_port} opened")
+            
+            # ⭐ Cập nhật Device status thành Online
+            self.update_device_status('Online')
         except Exception as e:
             print(f"⚠ Cannot open serial port {com_port}: {e}")
             self.ser = None
+    
+    def update_device_status(self, status):
+        """Cập nhật trạng thái Device trong database"""
+        if not self.com_port:
+            return
+        try:
+            query = """
+            UPDATE dbo.Device 
+            SET Status = ?, LastConnected = GETDATE()
+            WHERE SerialPort = ?
+            """
+            execute_query(query, (status, self.com_port))
+            print(f"✓ Device {self.com_port} status updated to {status}")
+        except Exception as e:
+            print(f"⚠ Update device status failed: {e}")
+    
+    def create_session(self, location=None):
+        """Tạo GestureSession mới"""
+        try:
+            if not location:
+                location = f'Auto_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
+            
+            print(f"\n📍 Creating GestureSession with location: '{location}'")
+            
+            # Lấy DeviceId từ COM port
+            query = "SELECT DeviceId FROM dbo.Device WHERE SerialPort = ?"
+            result = execute_query(query, (self.com_port,))
+            
+            if not result:
+                print("⚠ Device not found in database, creating new device...")
+                # Tạo device mới nếu chưa tồn tại
+                insert_query = """
+                INSERT INTO dbo.Device (DeviceName, SerialPort, BaudRate, Status, LastConnected)
+                VALUES (?, ?, 9600, 'Online', GETDATE())
+                """
+                execute_query(insert_query, (f"Arduino_{self.com_port}", self.com_port))
+                result = execute_query(query, (self.com_port,))
+            
+            if result:
+                self.device_id = result[0][0]
+                print(f"✓ Found DeviceId: {self.device_id}")
+                
+                # Tạo session mới
+                insert_query = """
+                INSERT INTO dbo.GestureSession (DeviceId, Location, TotalGestures, AverageConfidence)
+                VALUES (?, ?, 0, 0)
+                """
+                print(f"📝 Inserting GestureSession with DeviceId={self.device_id}, Location='{location}'")
+                execute_query(insert_query, (self.device_id, location))
+                
+                # Lấy SessionId vừa tạo
+                session_query = "SELECT TOP 1 SessionId FROM dbo.GestureSession WHERE DeviceId = ? ORDER BY SessionId DESC"
+                session_result = execute_query(session_query, (self.device_id,))
+                
+                if session_result:
+                    self.session_id = session_result[0][0]
+                    self.start_time = datetime.now()
+                    self.gesture_count = 0
+                    self.confidence_sum = 0.0
+                    print(f"✅ GestureSession created: SessionId={self.session_id}, Location='{location}'")
+        except Exception as e:
+            print(f"❌ Create session failed: {e}")
+    
+    def save_gesture_to_db(self, gesture_name, gesture_code, confidence, duration=0):
+        """Lưu cử chỉ vào database"""
+        if not self.session_id:
+            return
+        try:
+            query = """
+            INSERT INTO dbo.GestureHistory (SessionId, Gesture, Confidence, GestureCode, Duration, Quality)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """
+            quality = 'Good' if confidence >= 90 else ('Fair' if confidence >= 70 else 'Poor')
+            execute_query(query, (self.session_id, gesture_name, int(confidence), gesture_code, duration, quality))
+            
+            # Cập nhật thống kê session
+            self.gesture_count += 1
+            self.confidence_sum += confidence
+        except Exception as e:
+            print(f"⚠ Save gesture failed: {e}")
+    
+    def end_session(self):
+        """Kết thúc session và lưu thống kê"""
+        if not self.session_id:
+            return
+        try:
+            avg_confidence = self.confidence_sum / self.gesture_count if self.gesture_count > 0 else 0
+            query = """
+            UPDATE dbo.GestureSession 
+            SET EndTime = GETDATE(), TotalGestures = ?, AverageConfidence = ?
+            WHERE SessionId = ?
+            """
+            execute_query(query, (self.gesture_count, avg_confidence, self.session_id))
+            print(f"✓ GestureSession ended: Total={self.gesture_count}, AvgConfidence={avg_confidence:.2f}%")
+            
+            # Reset session
+            self.session_id = None
+            self.gesture_count = 0
+            self.confidence_sum = 0.0
+        except Exception as e:
+            print(f"⚠ End session failed: {e}")
     
     def _extract_keypoints(self, results):
         """Extract hand landmarks"""
@@ -157,37 +327,52 @@ class GestureEngine:
             return np.array([[res.x, res.y, res.z] for res in hand.landmark]).flatten()
         return np.zeros(63)
     
+    # def _send_serial(self, code):
+    #     """Send code to Arduino"""
+    #     if self.ser and self.ser.is_open:
+    #         try:
+    #             # Map short gesture codes to Arduino command names.
+    #             # Adjust this mapping to match the strings your Arduino sketch expects.
+    #             # Default mapping from single-letter gesture codes to Arduino command strings.
+    #             # Edit these values to exactly match the strings your Arduino sketch checks for.
+    #             # code_map = {
+    #             #     'R': 'BN_GREEN',   # example: want_rice -> Bắc-Nam green
+    #             #     'D': 'BN_GREEN',   # want_drink -> Bắc-Nam green
+    #             #     'C': 'DT_GREEN',   # change_dish -> Đông-Tây green
+    #             #     'E': 'DT_GREEN',   # dessert -> Đông-Tây green
+    #             #     'S': 'ALL_RED',    # satisfied -> turn all red (example)
+    #             #     'N': 'ALL_RED',    # not_satisfied -> all red (example)
+    #             #     'T': 'ALL_RED',    # ask_time -> all red (example)
+    #             #     'L': 'ALL_RED',    # clear_tray -> all red (example)
+    #             #     '0': 'ALL_RED'     # no hand -> all red
+    #             # }
+
+    #             # If code is a single-character short code, translate it.
+    #             cmd = None
+    #             if isinstance(code, str) and len(code) == 1:
+    #                 cmd = code_map.get(code, code)
+    #             else:
+    #                 cmd = code
+
+    #             # Ensure we send newline-terminated commands so Arduino's readStringUntil('\n') works.
+    #             if isinstance(cmd, str) and not cmd.endswith('\n'):
+    #                 cmd = cmd + '\n'
+
+    #             # Write to serial
+    #             self.ser.write(cmd.encode('utf-8') if isinstance(cmd, str) else cmd)
+    #             self.led_status = (code != '0')
+    #             return True
+    #         except Exception as e:
+    #             print(f"Serial error: {e}")
+    #     return False
+
     def _send_serial(self, code):
         """Send code to Arduino"""
         if self.ser and self.ser.is_open:
             try:
-                # Map short gesture codes to Arduino command names.
-                # Adjust this mapping to match the strings your Arduino sketch expects.
-                code_map = {
-                    'R': 'WANT_RICE',
-                    'D': 'WANT_DRINK',
-                    'C': 'CHANGE_DISH',
-                    'E': 'DESSERT',
-                    'S': 'SATISFIED',
-                    'N': 'NOT_SATISFIED',
-                    'T': 'ASK_TIME',
-                    'L': 'CLEAR_TRAY',
-                    '0': 'ALL_RED'
-                }
-
-                # If code is a single-character short code, translate it.
-                cmd = None
-                if isinstance(code, str) and len(code) == 1:
-                    cmd = code_map.get(code, code)
-                else:
-                    cmd = code
-
-                # Ensure we send newline-terminated commands so Arduino's readStringUntil('\n') works.
-                if isinstance(cmd, str) and not cmd.endswith('\n'):
-                    cmd = cmd + '\n'
-
-                # Write to serial
-                self.ser.write(cmd.encode('utf-8') if isinstance(cmd, str) else cmd)
+                cmd = code + '\n'  # Ensure command is newline-terminated
+                print(f">>> Sending to Arduino: '{cmd.strip()}'")
+                self.ser.write(cmd.encode('utf-8'))
                 self.led_status = (code != '0')
                 return True
             except Exception as e:
@@ -252,6 +437,8 @@ class GestureEngine:
                             self.current_gesture = gesture_name
                             self.current_confidence = confidence * 100
                         
+                        self.save_gesture_to_db(gesture_name, code, confidence * 100)
+                        
                         # Send to Arduino
                         if code != self.last_sent_code:
                             self._send_serial(code)
@@ -305,6 +492,11 @@ class GestureEngine:
     def stop(self):
         """Stop processing"""
         self.is_running = False
+        
+        self.end_session()
+        
+        self.update_device_status('Offline')
+        
         if self.cap:
             self.cap.release()
         if self.ser and self.ser.is_open:
@@ -327,11 +519,29 @@ def start_camera():
     data = request.json or {}
     com_port = data.get('com_port', 'COM3')
     baudrate = data.get('baudrate', 9600)
+    location = data.get('location', f'Auto_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+    
+    print(f"\n🚀 /api/start called")
+    print(f"   COM Port: {com_port}")
+    print(f"   BaudRate: {baudrate}")
+    print(f"   Location: {location}")
     
     if engine.is_running:
         return jsonify({'status': 'error', 'message': 'Already running'})
     
+    if engine_thread and engine_thread.is_alive():
+        time.sleep(1)  # Chờ thread cũ kết thúc
+    
+    engine.is_running = False
+    engine.frames_buffer.clear()
+    engine.results_list.clear()
+    engine.cooldown = 0
+    engine.hand_absent_frames = 0
+    engine.last_sent_code = None
+    
     engine._initialize_serial(com_port, baudrate)
+    
+    engine.create_session(location)
     
     engine_thread = threading.Thread(target=engine.run, daemon=True)
     engine_thread.start()
