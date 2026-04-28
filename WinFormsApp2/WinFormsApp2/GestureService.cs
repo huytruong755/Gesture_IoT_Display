@@ -25,11 +25,14 @@ namespace WinFormsApp2
         /// <summary>
         /// Start camera processing
         /// </summary>
-        public async Task<bool> StartAsync(string comPort = "COM3", int baudrate = 9600)
+        public async Task<bool> StartAsync(string comPort = "COM3", int baudrate = 9600, string location = null)
         {
             try
             {
-                var payload = new { com_port = comPort, baudrate = baudrate };
+                if (string.IsNullOrWhiteSpace(location))
+                    location = $"Auto_{DateTime.Now:yyyyMMdd_HHmmss}";
+                
+                var payload = new { com_port = comPort, baudrate = baudrate, location = location };
                 var json = JsonSerializer.Serialize(payload);
                 var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 

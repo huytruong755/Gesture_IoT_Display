@@ -63,6 +63,57 @@ namespace WinFormsApp2
             textBox_APIServer.Text = "http://localhost:5000";
         }
 
+        /// <summary>Hỏi người dùng nhập vị trí (Location).</summary>
+        private string PromptLocationInput()
+        {
+            Form promptForm = new Form()
+            {
+                Text = "Nhập vị trí sử dụng",
+                Width = 400,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            Label label = new Label() { Left = 20, Top = 20, Text = "Vị trí:", Width = 350 };
+            TextBox textBox = new TextBox()
+            {
+                Left = 20,
+                Top = 50,
+                Width = 350,
+                Text = $"Quán_{DateTime.Now:yyyy-MM-dd}"
+            };
+            Button okButton = new Button()
+            {
+                Text = "OK",
+                Left = 200,
+                Width = 80,
+                Top = 80,
+                DialogResult = DialogResult.OK
+            };
+            Button cancelButton = new Button()
+            {
+                Text = "Bỏ qua",
+                Left = 290,
+                Width = 80,
+                Top = 80,
+                DialogResult = DialogResult.Cancel
+            };
+
+            promptForm.Controls.Add(label);
+            promptForm.Controls.Add(textBox);
+            promptForm.Controls.Add(okButton);
+            promptForm.Controls.Add(cancelButton);
+            promptForm.AcceptButton = okButton;
+            promptForm.CancelButton = cancelButton;
+
+            string result = promptForm.ShowDialog() == DialogResult.OK ? textBox.Text : $"Auto_{DateTime.Now:yyyyMMdd_HHmmss}";
+            promptForm.Dispose();
+            return result;
+        }
+
         // ══════════════════════════════════════════════
         // TAB 1 – Camera
         // ══════════════════════════════════════════════
@@ -129,9 +180,12 @@ namespace WinFormsApp2
 
             if (!int.TryParse(textBox_BaudRate.Text, out int baudrate))
                 baudrate = 9600;
+            
+            // ⭐ Hỏi location (nơi sử dụng)
+            string location = PromptLocationInput();
 
             // Start camera
-            bool started = await _gestureService.StartAsync(comPort, baudrate);
+            bool started = await _gestureService.StartAsync(comPort, baudrate, location);
             if (!started)
             {
                 MessageBox.Show("Không thể khởi động camera.", "Lỗi");
