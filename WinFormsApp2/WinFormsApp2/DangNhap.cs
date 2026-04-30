@@ -32,17 +32,23 @@ namespace WinFormsApp2
             else
             {
                 string query = $"SELECT * FROM dbo.Account WHERE TenTaiKhoan = '{tentk}' AND MatKhau = '{matkhau}'";
-                if(modify.TaiKhoans(query).Count > 0)
+                var taiKhoans = modify.TaiKhoans(query);
+                if(taiKhoans.Count > 0)
                 {
                     MessageBox.Show("Đăng nhập thành công!","Thông báo",MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    //Mở dashboard
-                    Dashboard dashboard = new Dashboard();
-                    dashboard.ShowDialog();
+                    // //Mở dashboard
+                    // Dashboard dashboard = new Dashboard();
+                    // dashboard.ShowDialog();
 
                     this.Hide();
 
-                    dashboard.FormClosed += (s, args) => this.Show();
+                    Form dashboardForm = taiKhoans[0].Role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+                        ? new DashboardAdmin()
+                        : new Dashboard();
+
+                    dashboardForm.FormClosed += (s, args) => this.Show();
+                    dashboardForm.Show();
                 }
                 else
                 {

@@ -23,7 +23,10 @@ namespace WinFormsApp2
                 sqlCommand = new SqlCommand(query, sqlConnection);
                 dataReader = sqlCommand.ExecuteReader();
                 while(dataReader.Read()) {
-                    TaiKhoans.Add(new TaiKhoan(dataReader.GetString(0), dataReader.GetString(1)));
+                    string tenTaiKhoan = dataReader["TenTaiKhoan"]?.ToString() ?? string.Empty;
+                    string matKhau = dataReader["MatKhau"]?.ToString() ?? string.Empty;
+                    string role = dataReader["Role"] == DBNull.Value ? "User" : dataReader["Role"]?.ToString() ?? "User";
+                    TaiKhoans.Add(new TaiKhoan(tenTaiKhoan, matKhau, role));
                 }
 
                 sqlConnection.Close();
