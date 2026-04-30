@@ -119,10 +119,7 @@ WITH TotalCte AS
 SELECT TOP (1)
     r.Gesture,
     COUNT(*) AS Cnt,
-    MIN(COALESCE(r.Confidence, 0)) AS MinConfidence,
-    MAX(COALESCE(r.Confidence, 0)) AS MaxConfidence,
-    MIN(COALESCE(r.Quality, 0)) AS MinQuality,
-    MAX(COALESCE(r.Quality, 0)) AS MaxQuality,
+    AVG(CAST(COALESCE(r.Confidence, 0) AS FLOAT)) AS AvgConfidence,
     t.TotalRows
 FROM dbo.GestureHistory r
 CROSS JOIN TotalCte t
@@ -145,16 +142,12 @@ ORDER BY Cnt DESC, r.Gesture ASC;";
             int cnt = ToInt(reader["Cnt"]);
             int totalRows = Math.Max(1, ToInt(reader["TotalRows"]));
             double percent = cnt * 100.0 / totalRows;
-
-            int minConf = ToInt(reader["MinConfidence"]);
-            int maxConf = ToInt(reader["MaxConfidence"]);
-            int minQuality = ToInt(reader["MinQuality"]);
-            int maxQuality = ToInt(reader["MaxQuality"]);
+            double avgConfidence = ToDouble(reader["AvgConfidence"]);
 
             lblPopularGestureName.Text = gesture;
             lblPopularPercent.Text = $"{percent:0.#}%";
-            lblConfidenceRange.Text = $"Confidence: {minConf}-{maxConf}";
-            lblQualityRange.Text = $"Quality: {minQuality}-{maxQuality}";
+            lblConfidenceRange.Text = $"Confidence: {avgConfidence:0.#}";
+            lblQualityRange.Text = "Quality: OK";
         }
 
         private void LoadSessionList(SqlConnection conn)
